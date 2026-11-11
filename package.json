@@ -19,7 +19,9 @@
         "lint:fix": "biome check --write",
         "format": "biome format --write",
         "audit:ci": "npm audit --audit-level=high --omit=dev",
-        "prepush": "npm test && npm run lint:check && npm run audit:ci",
+        "secrets:scan": "gitleaks detect --no-banner --redact --config .gitleaks.toml",
+        "secrets:scan:local": "command -v gitleaks >/dev/null 2>&1 && npm run secrets:scan || echo 'gitleaks not installed — skipping local secret scan (CI will run it)'",
+        "prepush": "npm test && npm run lint:check && npm run audit:ci && npm run secrets:scan:local",
         "prepare": "husky"
     },
     "devDependencies": {

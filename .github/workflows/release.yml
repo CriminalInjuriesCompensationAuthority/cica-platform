@@ -1,0 +1,95 @@
+name: Release
+
+# Per-package, tag-based release for the cica-platform monorepo.
+# Packages are versioned INDEPENDENTLY and consumed via github: semver refs (not npm-registry yet),
+# so a release is: pick a package, verify its package.json version, run the quality gate, then create
+# a tag of the form `<package>-vX.Y.Z` plus a GitHub Release. No npm publish, no build step.
+#
+# Usage: Actions tab -> Release -> Run workflow -> choose the package + version.
+# Bump the package's package.json "version" and merge to the default branch FIRST, then run this.
+
+on:
+  workflow_dispatch:
+    inputs:
+      package:
+        description: "Which package to release"
+        required: true
+        type: choice
+        options:
+          - logger
+          - express-baseline
+          - nunjucks-govuk
+      version:
+        description: "Semver to release, e.g. 0.2.0 (the tag will be <package>-v<version>)"
+        required: true
+        type: string
+
+permissions:
+  contents: write   # create tag + GitHub Release
+
+jobs:
+  release:
+    runs-on: ubuntu-latest
+    steps:
+      - name: Checkout code
+        uses: actions/checkout@v4
+
+      - name: Set up Node.js
+        uses: actions/setup-node@v4
+        with:
+          node-version: "24.15.0"
+          cache: "npm"
+
+      - name: Install dependencies
+        run: npm ci
+
+      - name: Install gitleaks
+        run: |
+          # Pin gitleaks to avoid CLI command drift across runner package versions.
+          GITLEAKS_VERSION="8.21.2"
+          GITLEAKS_TARBALL="gitleaks_${GITLEAKS_VERSION}_linux_x64.tar.gz"
+          GITLEAKS_SHA256="5bc41815076e6ed6ef8fbecc9d9b75bcae31f39029ceb55da08086315316e3ba"
+          curl -sSL "https://github.com/gitleaks/gitleaks/releases/download/v${GITLEAKS_VERSION}/${GITLEAKS_TARBALL}" -o /tmp/gitleaks.tar.gz
+          echo "${GITLEAKS_SHA256}  /tmp/gitleaks.tar.gz" | sha256sum -c -
+          tar -xzf /tmp/gitleaks.tar.gz -C /tmp
+          sudo install /tmp/gitleaks /usr/local/bin/gitleaks
+          gitleaks version
+
+      - name: Verify package.json version matches requested version
+        env:
+          PKG: ${{ inputs.package }}
+          WANT: ${{ inputs.version }}
+        run: |
+          PKG_DIR="packages/$PKG"
+          if [ ! -f "$PKG_DIR/package.json" ]; then
+            echo "No package at $PKG_DIR"; exit 1
+          fi
+          HAVE="$(node -p "require('./$PKG_DIR/package.json').version")"
+          if [ "$HAVE" != "$WANT" ]; then
+            echo "$PKG_DIR/package.json version ($HAVE) != requested ($WANT)."
+            echo "Bump the package version and merge before releasing."
+            exit 1
+          fi
+          echo "Releasing @cica/$PKG v$WANT"
+
+      - name: Quality gate (test, lint, audit)
+        run: npm run prepush
+
+      - name: Create and push tag
+        env:
+          TAG: "${{ inputs.package }}-v${{ inputs.version }}"
+        run: |
+          git config user.name "github-actions[bot]"
+          git config user.email "github-actions[bot]@users.noreply.github.com"
+          if git rev-parse "$TAG" >/dev/null 2>&1; then
+            echo "Tag $TAG already exists"; exit 1
+          fi
+          git tag -a "$TAG" -m "Release $TAG"
+          git push origin "$TAG"
+
+      - name: Create GitHub Release
+        env:
+          GH_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+          TAG: "${{ inputs.package }}-v${{ inputs.version }}"
+          PKG: ${{ inputs.package }}
+        run: gh release create "$TAG" --generate-notes --title "@cica/$PKG v${{ inputs.version }}"

@@ -1,0 +1,7 @@
+# CODEOWNERS — provisioned by project-baseline.
+#
+# Owners are ORG-AWARE: GitHub only honours teams in the SAME org as the repo. This repo is in the
+# CriminalInjuriesCompensationAuthority org, so only that org's teams are listed here.
+#
+# Default owners for everything in the repo:
+*   @CriminalInjuriesCompensationAuthority/cica-dev-team
