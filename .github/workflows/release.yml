@@ -78,23 +78,30 @@ jobs:
       - name: Quality gate (test, lint, audit)
         run: npm run prepush
 
-      - name: Create and push tag
+      - name: Fail fast if the tag already exists
         env:
           TAG: "${{ inputs.package }}-v${{ inputs.version }}"
         run: |
-          git config user.name "github-actions[bot]"
-          git config user.email "github-actions[bot]@users.noreply.github.com"
-          if git rev-parse "$TAG" >/dev/null 2>&1; then
-            echo "Tag $TAG already exists"; exit 1
+          if git ls-remote --exit-code --tags origin "refs/tags/$TAG" >/dev/null 2>&1; then
+            echo "Tag $TAG already exists on the remote. Bump the version or delete the tag."
+            exit 1
           fi
-          git tag -a "$TAG" -m "Release $TAG"
-          git push origin "$TAG"
+          echo "Tag $TAG is free."
 
       - name: Publish package to GitHub Packages
         env:
           NODE_AUTH_TOKEN: ${{ secrets.GITHUB_TOKEN }}
           PKG: ${{ inputs.package }}
         run: npm publish --workspace "@cica/$PKG"
+
+      - name: Create and push tag
+        env:
+          TAG: "${{ inputs.package }}-v${{ inputs.version }}"
+        run: |
+          git config user.name "github-actions[bot]"
+          git config user.email "github-actions[bot]@users.noreply.github.com"
+          git tag -a "$TAG" -m "Release $TAG"
+          git push origin "$TAG"
 
       - name: Create GitHub Release
         env:
