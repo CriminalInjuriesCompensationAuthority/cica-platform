@@ -36,8 +36,9 @@ this running. You can open the URL in a browser to see published packages.
    ```
 
    This publishes `@cica/logger`, `@cica/express-baseline`, and `@cica/nunjucks-govuk` at their
-   current versions. (It temporarily points each package's `publishConfig` at the local registry and
-   restores it automatically — your committed manifests are left as-is.)
+   current versions. (Each package is published from an isolated temp copy with its
+   `publishConfig.registry` stripped, so your committed manifests are never touched — see
+   `demo/scripts/lib.sh`.)
 
 2. Install and run the example consumer:
 
@@ -72,8 +73,9 @@ npm ls @cica/logger   # now resolves to 0.1.1
 That `outdated -> update` is the signal Dependabot keys off on a real registry to open a bump PR
 automatically.
 
-> `demo:bump` edits `packages/logger/package.json`'s version. If you don't want to keep the bump,
-> revert it with `git checkout -- packages/logger/package.json` afterwards.
+> `demo:bump` does **not** modify any tracked file. The patched version is applied only in a
+> throwaway copy that gets published, so there is nothing to revert. Run it repeatedly to publish
+> `0.1.1`, `0.1.2`, ... (it increments from the latest version already in the registry).
 
 ## Reset / clean up
 

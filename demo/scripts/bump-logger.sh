@@ -1,41 +1,33 @@
 #!/usr/bin/env bash
 # Publish a bumped @cica/logger PATCH version to the local demo registry, so you
 # can show a consumer picking up the update (what Dependabot automates on a real
-# registry). This bumps the committed packages/logger/package.json version — it
-# is a real version change you should either keep or revert with git afterwards.
+# registry).
+#
+# The tracked packages/logger/package.json is NEVER modified: the bump happens
+# only in a temp copy that gets published (see lib.sh). Nothing to revert.
 set -euo pipefail
 
-REG="${DEMO_REGISTRY:-http://localhost:4873/}"
 ROOT="$(cd "$(dirname "${BASH_SOURCE[0]}")/../.." && pwd)"
 cd "$ROOT"
+# shellcheck source=lib.sh
+source "$ROOT/demo/scripts/lib.sh"
 
-# Ensure we have a valid demo-registry token (see login.sh).
-TOKEN_FILE="$ROOT/demo/.token"
-if [ ! -s "$TOKEN_FILE" ]; then
-  bash "$ROOT/demo/scripts/login.sh"
-fi
-TOKEN="$(cat "$TOKEN_FILE")"
-HOSTPORT="$(echo "$REG" | sed -E 's#^https?://##; s#/$##')"
-NPMRC="$(mktemp)"
-printf '//%s/:_authToken=%s\n' "$HOSTPORT" "$TOKEN" > "$NPMRC"
-export npm_config_userconfig="$NPMRC"
+REG="$(demo_registry)"
+NPMRC="$(demo_token_npmrc "$ROOT" "$REG")"
+trap 'rm -f "$NPMRC"' EXIT
 
-restore() {
-  npm pkg set "publishConfig.registry=https://registry.npmjs.org" --workspace "@cica/logger" >/dev/null 2>&1 || true
-  npm pkg set "publishConfig.access=public" --workspace "@cica/logger" >/dev/null 2>&1 || true
-  rm -f "$NPMRC"
-}
-trap restore EXIT
+# Base the next patch on whatever is ALREADY the latest in the demo registry, so
+# running this repeatedly keeps incrementing (0.1.1, 0.1.2, ...) instead of
+# colliding. Fall back to the tracked version if nothing is published yet.
+TRACKED="$(node -p "require('./packages/logger/package.json').version")"
+LATEST="$(npm view @cica/logger version --registry "$REG" --userconfig "$NPMRC" 2>/dev/null || true)"
+BASE="${LATEST:-$TRACKED}"
+NEXT="$(node -e "const [a,b,c]='$BASE'.split('.'); console.log(\`\${a}.\${b}.\${Number(c)+1}\`)")"
+CURRENT="$BASE"
 
-echo "== bumping @cica/logger patch version =="
-npm version patch --no-git-tag-version --workspace "@cica/logger"
+echo "== publishing @cica/logger@$NEXT (patch over $CURRENT) to $REG =="
+published="$(publish_pkg_copy "$ROOT" "logger" "$REG" "$NPMRC" "$NEXT")"
 
-NEW="$(node -p "require('./packages/logger/package.json').version")"
-echo "== publishing @cica/logger@$NEW to $REG =="
-npm pkg set "publishConfig.registry=$REG" --workspace "@cica/logger" >/dev/null
-npm pkg set "publishConfig.access=public" --workspace "@cica/logger" >/dev/null
-npm publish --workspace "@cica/logger" --registry "$REG"
-
-echo "== published @cica/logger@$NEW =="
+echo "== published @cica/logger@$published =="
 echo "In demo/consumer run:  npm update @cica/logger   (then: npm ls @cica/logger)"
-echo "NOTE: this changed packages/logger/package.json version. Revert with git if you don't want to keep it."
+echo "The tracked packages/logger/package.json is unchanged — nothing to revert."
