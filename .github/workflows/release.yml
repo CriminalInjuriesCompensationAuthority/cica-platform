@@ -26,6 +26,7 @@ on:
 
 permissions:
   contents: write   # create tag + GitHub Release
+  packages: write   # publish package to GitHub Packages
 
 jobs:
   release:
@@ -39,6 +40,8 @@ jobs:
         with:
           node-version: "24.15.0"
           cache: "npm"
+          registry-url: "https://npm.pkg.github.com"
+          scope: "@cica"
 
       - name: Install dependencies
         run: npm ci
@@ -86,6 +89,12 @@ jobs:
           fi
           git tag -a "$TAG" -m "Release $TAG"
           git push origin "$TAG"
+
+      - name: Publish package to GitHub Packages
+        env:
+          NODE_AUTH_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+          PKG: ${{ inputs.package }}
+        run: npm publish --workspace "@cica/$PKG"
 
       - name: Create GitHub Release
         env:

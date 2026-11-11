@@ -15,6 +15,15 @@
         "src",
         "!src/**/*.test.js"
     ],
+    "repository": {
+        "type": "git",
+        "url": "git+https://github.com/CriminalInjuriesCompensationAuthority/cica-platform.git",
+        "directory": "packages/express-baseline"
+    },
+    "publishConfig": {
+        "registry": "https://npm.pkg.github.com",
+        "access": "restricted"
+    },
     "scripts": {
         "test": "c8 node --test",
         "coverage:html": "c8 report --reporter=html",
