@@ -1,0 +1,17 @@
+name: CI
+# Thin caller — delegates to the central reusable pipeline in project-baseline.
+# This is an npm-workspaces monorepo: a single root install (npm ci) and the root
+# test/lint/audit scripts fan out across every package, so one job covers all of them.
+# The CI logic lives in project-baseline, not here; only the pinned ref below is bumped (via sync).
+on:
+  pull_request:
+  push:
+    branches: [main]
+permissions:
+  contents: read
+jobs:
+  ci:
+    uses: CriminalInjuriesCompensationAuthority/project-baseline/.github/workflows/node-ci.yml@v1
+    with:
+      node-version: "24.15.0"
+      working-directory: "."

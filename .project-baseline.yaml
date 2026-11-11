@@ -1,0 +1,7 @@
+# Managed by project-baseline. See docs/metadata.md in that repo.
+# This repo is an npm-workspaces monorepo of node-library packages (@cica/*).
+baselineVersion: 0.1.0
+profile: node-library
+org: CriminalInjuriesCompensationAuthority
+adoptedAt: 2026-11-11
+managed: true

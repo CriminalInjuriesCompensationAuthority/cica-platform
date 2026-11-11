@@ -1,0 +1,35 @@
+{
+    "name": "@cica/express-baseline",
+    "version": "0.1.0",
+    "description": "Hardened Express runtime behaviour for CICA services: helmet/CSP/HSTS, security headers, env validation, error handlers, health.",
+    "type": "module",
+    "main": "src/index.js",
+    "exports": {
+        ".": "./src/index.js"
+    },
+    "engines": {
+        "node": ">=24.15.0",
+        "npm": ">=11.12.1"
+    },
+    "files": [
+        "src",
+        "!src/**/*.test.js"
+    ],
+    "scripts": {
+        "test": "c8 node --test",
+        "coverage:html": "c8 report --reporter=html",
+        "lint": "biome check",
+        "lint:check": "biome check",
+        "lint:fix": "biome check --write"
+    },
+    "peerDependencies": {
+        "express": ">=4"
+    },
+    "dependencies": {
+        "helmet": "^8.0.0"
+    },
+    "devDependencies": {
+        "express": "^5.0.0"
+    },
+    "license": "MIT"
+}
