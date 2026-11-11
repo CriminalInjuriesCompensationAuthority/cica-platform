@@ -10,11 +10,14 @@ Managed by [`project-baseline`](https://github.com/CriminalInjuriesCompensationA
 
 ## Install
 
-Consumed via a GitHub semver ref (not the npm registry):
+Published to the npm registry under the `@cica` scope — depend on it by name and semver range:
 
 ```jsonc
-"@cica/logger": "github:CriminalInjuriesCompensationAuthority/cica-platform#semver:logger-v0.1.0"
+"@cica/logger": "^0.1.0"
 ```
+
+See [`docs/consuming-apps.md`](../../docs/consuming-apps.md) for the full consumer setup (Dependabot,
+Node version), and [`docs/packaging.md`](../../docs/packaging.md) for how publishing works.
 
 `pino-pretty` is an optional peer dependency — install it in the consumer only if you want the dev
 pretty transport (it is not needed in production).

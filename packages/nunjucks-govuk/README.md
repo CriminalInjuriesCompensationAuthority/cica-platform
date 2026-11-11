@@ -16,9 +16,13 @@ version is governed by `@ministryofjustice/frontend` (the declared dependency).
 
 ## Install
 
+Published to the npm registry under the `@cica` scope — depend on it by name and semver range:
+
 ```jsonc
-"@cica/nunjucks-govuk": "github:CriminalInjuriesCompensationAuthority/cica-platform#semver:nunjucks-govuk-v0.1.0"
+"@cica/nunjucks-govuk": "^0.1.0"
 ```
+
+See [`docs/consuming-apps.md`](../../docs/consuming-apps.md) for the full consumer setup.
 
 Peer dependencies (provided by the app): `express`, `nunjucks`, `@ministryofjustice/frontend`.
 `govuk-frontend` is pulled in transitively by `@ministryofjustice/frontend` — do not declare it

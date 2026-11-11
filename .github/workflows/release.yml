@@ -1,12 +1,15 @@
 name: Release
 
 # Per-package, tag-based release for the cica-platform monorepo.
-# Packages are versioned INDEPENDENTLY and consumed via github: semver refs (not npm-registry yet),
-# so a release is: pick a package, verify its package.json version, run the quality gate, then create
-# a tag of the form `<package>-vX.Y.Z` plus a GitHub Release. No npm publish, no build step.
+# Packages are versioned INDEPENDENTLY and published to the npm registry under the @cica scope.
+# A release is: pick a package, verify its package.json version, run the quality gate, publish to
+# npm, then create a tag of the form `<package>-vX.Y.Z` plus a GitHub Release.
+#
+# Requires the repo secret NPM_TOKEN (an npm automation token for the @cica scope).
 #
 # Usage: Actions tab -> Release -> Run workflow -> choose the package + version.
 # Bump the package's package.json "version" and merge to the default branch FIRST, then run this.
+# See docs/runbooks/release-a-package.md for the full procedure.
 
 on:
   workflow_dispatch:

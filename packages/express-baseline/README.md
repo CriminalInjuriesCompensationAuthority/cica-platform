@@ -14,9 +14,13 @@ project-baseline.
 
 ## Install
 
+Published to the npm registry under the `@cica` scope — depend on it by name and semver range:
+
 ```jsonc
-"@cica/express-baseline": "github:CriminalInjuriesCompensationAuthority/cica-platform#semver:express-baseline-v0.1.0"
+"@cica/express-baseline": "^0.1.0"
 ```
+
+See [`docs/consuming-apps.md`](../../docs/consuming-apps.md) for the full consumer setup.
 
 `express` is a peer dependency (the app provides it).
 

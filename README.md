@@ -21,18 +21,22 @@ individually — nothing here requires taking all three.
 
 ## Using a package
 
-Consumed via a GitHub semver ref (interim, until npm-registry publish is set up):
+Packages are published to the npm registry under the `@cica` scope. Depend on one by name and a
+semver range:
 
 ```jsonc
-"@cica/logger": "github:CriminalInjuriesCompensationAuthority/cica-platform#semver:logger-v0.1.0"
+"@cica/logger": "^0.1.0"
 ```
 
 ```js
 import { createLogger } from '@cica/logger';
 ```
 
-The import specifier is always the package name (`@cica/<name>`) regardless of which repo it lives
-in — imports are unchanged by the move into this monorepo.
+Take only the package(s) you need — nothing here requires all three. For the full consumer setup
+(Dependabot, Node version, optional peers) see [`docs/consuming-apps.md`](docs/consuming-apps.md).
+For how publishing and releases work, and the reasoning behind the registry choice, see
+[`docs/packaging.md`](docs/packaging.md). To try the whole publish → consume → update loop locally
+without the registry, see [`demo/README.md`](demo/README.md).
 
 ## Development
 
@@ -73,10 +77,11 @@ own `test`/`lint` scripts, so it stays independently buildable and publishable.
 
 ## Versioning & releases
 
-Packages are versioned **independently**. A package is released by pushing a tag of the form
-`<name>-vX.Y.Z` (e.g. `logger-v0.2.0`), which builds and publishes only that package. A change to one
-package does not force a version bump on the others, so a consumer that only uses `@cica/logger`
-never sees churn from the other packages.
+Packages are versioned **independently**. A release is cut from the **Release** workflow (Actions →
+Release → Run workflow): pick a package and version, and it runs the quality gate, publishes that
+package to npm, and creates a `<name>-vX.Y.Z` tag (e.g. `logger-v0.2.0`) plus a GitHub Release. A
+change to one package does not force a version bump on the others, so a consumer that only uses
+`@cica/logger` never sees churn from the other packages. Step-by-step: [`docs/runbooks/release-a-package.md`](docs/runbooks/release-a-package.md).
 
 ## License
 
