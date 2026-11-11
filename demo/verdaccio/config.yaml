@@ -1,0 +1,36 @@
+# Verdaccio config for the LOCAL DEMO registry only.
+# This registry is disposable and runs on localhost — it intentionally allows
+# anonymous publish/access so the demo needs no login, token, or htpasswd setup.
+# Do NOT use this configuration for anything other than a throwaway local demo.
+
+storage: ./storage
+
+# No auth backend — anonymous access is allowed (see package rules below).
+auth:
+  htpasswd:
+    file: ./htpasswd
+    # Allow self-registration too, though the demo does not require logging in.
+    max_users: 1000
+
+# Proxy the public npm registry so the example consumer can still resolve
+# third-party deps (pino, express, etc.) that are not part of @cica/*.
+uplinks:
+  npmjs:
+    url: https://registry.npmjs.org/
+
+packages:
+  '@cica/*':
+    # Anyone (including anonymous) can read and publish the @cica scope locally.
+    access: $all
+    publish: $all
+    unpublish: $all
+    # Do NOT fall through to the public registry for @cica/* — these are local.
+
+  '**':
+    # Everything else is read-only and proxied from npmjs.
+    access: $all
+    publish: $authenticated
+    proxy: npmjs
+
+# Keep the demo quiet-ish.
+log: { type: stdout, format: pretty, level: warn }

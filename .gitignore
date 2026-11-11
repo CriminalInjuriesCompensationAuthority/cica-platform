@@ -2,3 +2,9 @@ node_modules/
 coverage/
 .env
 stuff/
+
+# Local demo registry artifacts (generated at runtime)
+demo/verdaccio/storage/
+demo/verdaccio/htpasswd
+demo/.token
+demo/consumer/package-lock.json

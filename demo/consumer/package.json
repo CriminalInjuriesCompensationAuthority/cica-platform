@@ -1,0 +1,13 @@
+{
+    "name": "cica-demo-consumer",
+    "version": "0.0.0",
+    "private": true,
+    "type": "module",
+    "description": "Example app that consumes @cica/logger from the local demo registry.",
+    "scripts": {
+        "start": "NODE_ENV=production node index.js"
+    },
+    "dependencies": {
+        "@cica/logger": "^0.1.0"
+    }
+}

@@ -22,12 +22,16 @@
         "secrets:scan": "gitleaks detect --no-banner --redact --config .gitleaks.toml",
         "secrets:scan:local": "command -v gitleaks >/dev/null 2>&1 && npm run secrets:scan || echo 'gitleaks not installed — skipping local secret scan (CI will run it)'",
         "prepush": "npm test && npm run lint:check && npm run audit:ci && npm run secrets:scan:local",
-        "prepare": "husky"
+        "prepare": "husky",
+        "demo:registry": "verdaccio --config demo/verdaccio/config.yaml --listen 4873",
+        "demo:publish": "bash demo/scripts/publish-all.sh",
+        "demo:bump": "bash demo/scripts/bump-logger.sh"
     },
     "devDependencies": {
         "@biomejs/biome": "2.5.12",
         "c8": "^12.0.0",
-        "husky": "^9.1.7"
+        "husky": "^9.1.7",
+        "verdaccio": "^7.1.0"
     },
     "license": "MIT"
 }
