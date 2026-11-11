@@ -21,8 +21,8 @@
         "directory": "packages/express-baseline"
     },
     "publishConfig": {
-        "registry": "https://npm.pkg.github.com",
-        "access": "restricted"
+        "registry": "https://registry.npmjs.org",
+        "access": "public"
     },
     "scripts": {
         "test": "c8 node --test",
