@@ -28,7 +28,7 @@
         "demo:bump": "bash demo/scripts/bump-logger.sh"
     },
     "devDependencies": {
-        "@biomejs/biome": "2.5.12",
+        "@biomejs/biome": "2.6.6",
         "c8": "^12.0.0",
         "husky": "^9.1.7",
         "verdaccio": "^7.1.0"
