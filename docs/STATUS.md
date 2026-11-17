@@ -60,10 +60,6 @@ the context is not lost between sessions. Last updated 2026-11-11.
 - **Security alert (`minimatch`, medium, dev-only).** Reached via `c8 → test-exclude → minimatch`;
   the fix is a major bump upstream has not adopted. Low practical risk (dev tooling, trusted
   patterns). Decide whether to dismiss or add an override.
-- **`chatgpt.md` at the repo root.** A 546-line raw design-brainstorm transcript from the first
-  commit, now public. It was scanned (no emails, URLs, internal names or secrets) but is untidy for a
-  public standards repo, and it is superseded by `.kiro/specs/`. Consider moving it under `docs/` or
-  removing it (it would remain in git history).
 - **`biome.json` is `♻ replace`.** The baseline's `common/biome.json` is much stricter than
   `cica-platform`'s (extra rules, a11y/security presets), so adopting it on an existing repo can
   change lint results and fail CI. This is the baseline's stated design; worth knowing before
@@ -86,7 +82,7 @@ Per-task status is in `project-baseline/.kiro/specs/project-baseline/tasks.md`. 
 
 ## Recommended order when picking back up
 
-1. Settle the `project-baseline` decisions above (Dependabot PRs, `chatgpt.md`, public/private).
+1. Settle the `project-baseline` decisions above (Dependabot PRs, public/private).
 2. Resolve the `@cica` npm org + `NPM_TOKEN`, then cut the first real `@cica/logger` release and wire
    up one consuming app end to end.
 3. Decide GitHub auth for `validate`, which unlocks `sync` and the estate rollout.
