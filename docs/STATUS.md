@@ -27,8 +27,16 @@ the context is not lost between sessions. Last updated 2026-11-11.
 - **The `v1` tag matters:** every adopted repo's `ci.yml` calls
   `project-baseline/.github/workflows/node-ci.yml@v1`. Until the tag was created, `cica-platform`'s
   CI failed on every push ("workflow file issue"). Rules for moving it are in that repo's README.
-- The `baseline` CLI (`tooling/`, 119 tests) works for new and existing repos: `inspect`, `plan`,
-  `audit`, `discover`, `deps`, and local `apply` (never touches the source repo; stops before push).
+- The `baseline` CLI (`tooling/`, 148 tests) works for new and existing repos: `inspect`, `plan`,
+  `audit`, `discover`, `deps`, and `apply` (never touches the source repo).
+- **`apply --push`** pushes the adoption branch and opens the PR, using your own `gh` login; there
+  is also `--dry-run` and `--draft`.
+  - Verified end to end on `project-baseline-sandbox`: PR #1 opened, its CI passed, and a second run
+    reported the existing PR instead of duplicating it.
+  - In a fresh clone of that branch, `npm ci` installed Husky, the pre-commit hook auto-formatted a
+    file, rejected a partially staged one and blocked a staged private key, and the pre-push gate
+    passed.
+  - Step by step: `project-baseline/docs/runbooks/adopt-a-repo.md`.
 - Verified end to end on a synthetic brand-new `master`-default repo containing only a
   `package.json`: one `apply` produced the full standard, the CI caller triggered on `master`, no
   unresolved placeholders, nothing left for manual review.
@@ -72,10 +80,9 @@ the context is not lost between sessions. Last updated 2026-11-11.
 
 Per-task status is in `project-baseline/.kiro/specs/project-baseline/tasks.md`. Not built yet:
 
-- **`validate`** (push the `baseline/adopt-*` branch and open the PR). This is the one manual step in
-  every adoption today. Needs a GitHub-auth decision (GitHub App vs PAT).
-- **`sync`** (propagate standard changes to all repos) and GitHub-side fleet enumeration. Depends on
-  the above.
+- **`sync`** (propagate standard changes to all repos) and GitHub-side fleet enumeration. Needs an
+  auth decision for running unattended (GitHub App vs PAT); `apply --push` covers one repo at a
+  time with your own login.
 - **`create`** (polished generator). Needs the Copier-vs-Projen decision; `apply` already scaffolds
   an empty repo, so this is polish.
 - `github-action` and `legacy` profiles; `policies/governance.yaml`; estate rollout.
@@ -88,4 +95,5 @@ Per-task status is in `project-baseline/.kiro/specs/project-baseline/tasks.md`. 
 1. Settle the `project-baseline` decisions above (Dependabot PRs, public/private).
 2. Resolve the `@cica` npm org + `NPM_TOKEN`, then cut the first real `@cica/logger` release and wire
    up one consuming app end to end.
-3. Decide GitHub auth for `validate`, which unlocks `sync` and the estate rollout.
+3. Start adopting real repos with `apply --push` (one at a time, reviewed). Decide GitHub auth for
+   unattended `sync` when you want fleet-wide propagation.
