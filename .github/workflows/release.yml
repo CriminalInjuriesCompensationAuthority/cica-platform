@@ -42,8 +42,6 @@ jobs:
         with:
           node-version: "24.15.0"
           cache: "npm"
-          registry-url: "https://registry.npmjs.org"
-          scope: "@cica"
 
       - name: Install dependencies
         run: npm ci
@@ -89,6 +87,15 @@ jobs:
             exit 1
           fi
           echo "Tag $TAG is free."
+
+      # Registry auth is configured only here, right before publish, so install/test/audit never
+      # send registry credentials and dependency install scripts cannot read the token.
+      - name: Configure npm registry auth (publish step only)
+        uses: actions/setup-node@v4
+        with:
+          node-version: "24.15.0"
+          registry-url: "https://registry.npmjs.org"
+          scope: "@cica"
 
       - name: Publish package to npm
         env:
