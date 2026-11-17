@@ -21,7 +21,9 @@ the context is not lost between sessions. Last updated 2026-11-11.
 
 ### `project-baseline`
 - Live on GitHub (`CriminalInjuriesCompensationAuthority/project-baseline`, **public**, default
-  branch `main`). CI is green. Tags **`v1`** (moving) and **`v1.0.0`** exist.
+  branch `main`). CI is green. Tags **`v1`** (moving; currently the `actions/checkout` +
+  `setup-node` v7 bump), **`v1.0.0`** and **`v1.0.1`** exist. To roll `v1` back:
+  `git tag -f v1 cee6263 && git push --force origin v1`.
 - **The `v1` tag matters:** every adopted repo's `ci.yml` calls
   `project-baseline/.github/workflows/node-ci.yml@v1`. Until the tag was created, `cica-platform`'s
   CI failed on every push ("workflow file issue"). Rules for moving it are in that repo's README.
@@ -51,9 +53,6 @@ the context is not lost between sessions. Last updated 2026-11-11.
 
 ## `project-baseline`: open items that need your call
 
-- **Dependabot PR #1** (`actions/checkout` + `setup-node` v4 → v7 in `node-ci.yml`). Probably fine
-  (the profile templates already use v7), but `node-ci.yml` is the reusable workflow every repo
-  calls, so it changes fleet CI the moment `v1` is moved. Merge deliberately, then move `v1`.
 - **Dependabot PR #2** (Biome 2.5.12 → 2.6.7 in `tooling`). The whole estate is pinned to 2.5.12, so
   merging it alone creates skew against the standard the baseline publishes. Suggest closing it and
   upgrading Biome estate-wide via `policies/versions.json` + `common/biome.json` when wanted.
