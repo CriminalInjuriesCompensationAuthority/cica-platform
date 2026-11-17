@@ -53,9 +53,13 @@ the context is not lost between sessions. Last updated 2026-11-11.
 
 ## `project-baseline`: open items that need your call
 
-- **Dependabot PR #2** (Biome 2.5.12 → 2.6.7 in `tooling`). The whole estate is pinned to 2.5.12, so
-  merging it alone creates skew against the standard the baseline publishes. Suggest closing it and
-  upgrading Biome estate-wide via `policies/versions.json` + `common/biome.json` when wanted.
+- **Biome version policy.** PR #2 (Biome 2.5.12 → 2.6.7) was closed because the whole estate is
+  pinned to 2.5.12 and merging it alone would create skew against the standard. Closing only silences
+  that one version; there is **no Dependabot ignore rule**, so the next Biome release will be
+  proposed again. Decide whether to add an `ignore` for `@biomejs/biome` in
+  `project-baseline/.github/dependabot.yml` (and `dependabot/default.yml`, which is shipped to every
+  repo), or to upgrade Biome estate-wide on a schedule via `policies/versions.json` +
+  `common/biome.json`.
 - **Security alert (`minimatch`, medium, dev-only).** Reached via `c8 → test-exclude → minimatch`;
   the fix is a major bump upstream has not adopted. Low practical risk (dev tooling, trusted
   patterns). Decide whether to dismiss or add an override.
